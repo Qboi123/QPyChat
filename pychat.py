@@ -2,12 +2,12 @@ import colorsys
 import math
 import socket
 import threading
-from tkinter import colorchooser
+from tkinter import colorchooser, ttk
 from tkinter.filedialog import asksaveasfilename
 from tkinter.tix import *
 from typing import Type, List, Dict, Union, Optional, Tuple
 
-from advUtils.network import PackageEncoder, PackageDecoder, PackageSystem
+from advUtils.network import PacketEncoder, PacketDecoder, PacketSystem
 
 import nzt
 
@@ -33,6 +33,8 @@ elif version == 3:
 print(f"Starting program on Python {version}.{subversion}.{subsubversion}")
 print(f"Tested Python versions: 3.7.4 and 3.7.6")
 
+ICONS = {}
+
 # Globals
 EVT_DISCONNECT = "disconnect"
 EVT_USERNAME_CHANGE = "username_change"
@@ -45,13 +47,13 @@ COLOR_WIN_BG = "#ffffff"
 COLOR_WIN_FG = "#474747"
 COLOR_CHAT_BG = "#efefef"
 COLOR_CHAT_FG = "#37ff37"
-COLOR_TEXT_INPUT_BG = "#efefef"
-COLOR_TEXT_INPUT_FG = "#373737"
-COLOR_SCROLL_FG = "#afafaf"
-COLOR_SCROLL_BG = "#efefef"
-COLOR_CLIENT_TYPE_BG = "#efefef"
-COLOR_CLIENT_TYPE_FG = "#373737"
-COLOR_CLIENT_TYPE_ACT = COLOR_ACCENT
+COLOR_TEXT_INPUT_BG = "#6f6f6f"
+COLOR_TEXT_INPUT_FG = "#afafaf"
+COLOR_SCROLL_FG = "#676767"
+COLOR_SCROLL_BG = "#5c5c5c"
+COLOR_CLIENT_TYPE_BG = "#6f6f6f"
+COLOR_CLIENT_TYPE_FG = "#ffffff"
+COLOR_CLIENT_TYPE_ACT = "#00a7a7"
 COLOR_CONNECTER_BG = "#efefef"
 COLOR_CONNECTER_FG = "#373737"
 COLOR_CONNECTER_ACT = COLOR_ACCENT
@@ -61,8 +63,8 @@ COLOR_OK_BTN_ACT = None
 COLOR_BTN_BG = "#efefef"
 COLOR_BTN_FG = "#373737"
 COLOR_BTN_ACT = None
-COLOR_LIST_BG = "#efefef"
-COLOR_LIST_FG = "#373737"
+COLOR_LIST_BG = "#5c5c5c"
+COLOR_LIST_FG = "#6f6f6f"
 COLOR_LIST_SEL = COLOR_ACCENT
 COLOR_LBL_BG = COLOR_WIN_BG
 COLOR_LBL_FG = COLOR_WIN_FG
@@ -95,10 +97,192 @@ THEME_DARK = "theme::dark"
 THEME_LIGHT = "theme::light"
 COLOR_THEME = THEME_DARK
 
-# ----- THEME END ----- #
+TREEVIEW_BG = "#6f6f6f"
+TREEVIEW_FG = "#9f9f9f"
+TREEVIEW_SEL_BG = "#00a7a7"
+TREEVIEW_SEL_FG = "white"
 
-# Encryption Salt
-SALT: bytes = b"SlTKeYOpHygTYkP3"  # TODO: This is unused
+BUTTON_BG = "#6f6f6f"
+BUTTON_BG_FOC = "#00a7a7"
+BUTTON_BG_DIS = "#5c5c5c"
+BUTTON_FG = "#a7a7a7"
+BUTTON_FG_FOC = "white"
+BUTTON_FG_DIS = "#6f6f6f"
+BUTTON_BD_COL = "#00a7a7"
+BUTTON_RELIEF = "flat"
+BUTTON_BD_WID = 0
+
+ENTRY_BG = "#5c5c5c"
+ENTRY_BG_FOC = "#00a7a7"
+ENTRY_BG_DIS = "#6f6f6f"
+ENTRY_FG = "#6f6f6f"
+ENTRY_FG_FOC = "white"
+ENTRY_FG_DIS = "#a7a7a7"
+ENTRY_BD_COL = "#00a7a7"
+ENTRY_RELIEF = "flat"
+ENTRY_BD_WID = 0
+ENTRY_SEL_BG = "#00c9c9"
+ENTRY_SEL_BG_FOC = "#00dada"
+ENTRY_SEL_BG_DIS = "#a7a7a7"
+ENTRY_SEL_FG = "#6f6f6f"
+ENTRY_SEL_FG_FOC = "white"
+ENTRY_SEL_FG_DIS = "#ffffff"
+
+
+def theme(widget=None):
+    c_font_t = ("helvetica", 11)
+
+    style = ttk.Style(widget)
+    style.theme_settings("default", {
+        "TEntry": {
+            "configure": {"font": c_font_t, "relief": "flat", "selectborderwidth": 0, "padding": 5},
+            "map": {
+                "relief": [("active", ENTRY_RELIEF),
+                           ("focus", ENTRY_RELIEF),
+                           ("!disabled", ENTRY_RELIEF)],
+                "bordercolor": [("active", ENTRY_BD_COL),
+                                ("focus", ENTRY_BD_COL),
+                                ("!disabled", ENTRY_BD_COL)],
+                "background": [("active", ENTRY_BG),
+                               ("focus", ENTRY_BG_FOC),
+                               ("!disabled", ENTRY_BG_DIS)],
+                "fieldbackground": [("active", ENTRY_BG),
+                                    ("focus", ENTRY_BG_FOC),
+                                    ("!disabled", ENTRY_BG_DIS)],
+                "foreground": [("active", ENTRY_FG),
+                               ("focus", ENTRY_FG_FOC),
+                               ("!disabled", ENTRY_FG_DIS)],
+                "selectbackground": [("active", ENTRY_SEL_BG),
+                                     ("focus", ENTRY_SEL_BG_FOC),
+                                     ("!disabled", ENTRY_SEL_BG_DIS)],
+                "selectforeground": [("active", ENTRY_SEL_FG),
+                                     ("focus", ENTRY_SEL_FG_FOC),
+                                     ("!disabled", ENTRY_SEL_FG_DIS)]
+            }
+        },
+        "TLabel": {
+            "configure": {"background": "#5c5c5c",
+                          "foreground": "#8f8f8f",
+                          "font": c_font_t}
+        },
+        "TFrame": {
+            "configure": {"background": "#5c5c5c"}
+        },
+        "TButton": {
+            "configure": {"font": c_font_t, "relief": BUTTON_RELIEF, "bd": 1},
+            "map": {
+                "background": [("active", BUTTON_BG_FOC),
+                               ("focus", BUTTON_BG),
+                               ("!disabled", BUTTON_BG)],
+                "bordercolor": [("active", BUTTON_BD_COL),
+                                ("focus", BUTTON_BG_FOC),
+                                ("!disabled", BUTTON_BD_COL)],
+                "foreground": [("active", BUTTON_FG_FOC),
+                               ("focus", BUTTON_FG_FOC),
+                               ("!disabled", BUTTON_FG)],
+            }
+        },
+        "Treeview": {
+            "configure": {"padding": 0, "font": c_font_t, "relief": "flat", "border": 0,
+                          "rowheight": 24},
+            "map": {
+                "background": [("active", TREEVIEW_BG),
+                               ("focus", TREEVIEW_SEL_BG),
+                               ("!disabled", TREEVIEW_BG),
+                               ("selected", TREEVIEW_BG)],
+                "fieldbackground": [("active", TREEVIEW_BG),
+                                    ("focus", TREEVIEW_BG),
+                                    ("!disabled", TREEVIEW_BG)],
+                "foreground": [("active", TREEVIEW_FG),
+                               ("focus", TREEVIEW_SEL_FG),
+                               ("!disabled", TREEVIEW_FG),
+                               ("selected", TREEVIEW_FG)],
+                "relief": [("focus", "flat"),
+                           ("active", "flat"),
+                           ("!disabled", "flat")]
+            }
+        },
+        "Treeview.Item": {
+            "configure": {"padding": 0},
+            "map": {
+                "background": [("active", TREEVIEW_SEL_BG),
+                               ("!disabled", TREEVIEW_SEL_BG),
+                               ("!selected", TREEVIEW_SEL_BG)],
+                "fieldbackground": [("!disabled", TREEVIEW_SEL_BG),
+                                    ("active", TREEVIEW_SEL_BG),
+                                    ("!selected", TREEVIEW_SEL_BG)],
+                "foreground": [("active", TREEVIEW_SEL_BG),
+                               ("focus", TREEVIEW_SEL_FG),
+                               ("!disabled", TREEVIEW_SEL_FG),
+                               ("selected", TREEVIEW_SEL_BG)],
+                "relief": [("focus", "flat"),
+                           ("active", "flat"),
+                           ("!disabled", "flat")]
+            }
+        },
+        "Treeview.Cell": {
+            "configure": {"padding": 0},
+            "map": {
+                "background": [("active", TREEVIEW_SEL_BG),
+                               ("!disabled", TREEVIEW_SEL_BG),
+                               ("!selected", TREEVIEW_SEL_BG)],
+                "fieldbackground": [("!disabled", TREEVIEW_SEL_BG),
+                                    ("active", TREEVIEW_SEL_BG),
+                                    ("!selected", TREEVIEW_SEL_BG)],
+                "foreground": [("focus", TREEVIEW_SEL_FG),
+                               ("!disabled", TREEVIEW_SEL_FG),
+                               ("!selected", TREEVIEW_SEL_BG)],
+                "relief": [("focus", "flat"),
+                           ("active", "flat"),
+                           ("!disabled", "flat")]
+            }
+        }
+    })
+    # print(style.map("Treeview"))
+    # print(style.configure("Treeview"))
+    # print(style.co("Treeview"))
+
+    # style.configure("BW.TTreeview", foreground=", background="white")
+    #
+    # foreground = "black", background = "white"
+    # sty
+    style.theme_use("default")
+    style.configure('TEntry', relief='flat', bd=0, borderwidth=0)
+
+    # print(style.layout("TEntry"))
+
+    #   lets try to change this structure
+    style.layout('TEntry', [
+        ('Entry.highlight', {
+            "border": 0,
+            'sticky': 'nswe',
+            'children': [('Entry.border', {
+                'border': 0,
+                'sticky': 'nswe',
+                'children':
+                    [('Entry.padding', {
+                        'sticky': 'nswe',
+                        'children':
+                            [('Entry.textarea', {
+                                'sticky': 'nswe',
+                                "border": 0})]
+                    })]
+            }), ('Entry.bd', {
+                'sticky': 'nswe',
+                'children': [(
+                    'Entry.padding', {
+                        'sticky': 'nswe',
+                        'children': [(
+                            'Entry.textarea', {
+                                'sticky': 'nswe'})]
+                    })],
+                'border': 0})
+                         ]
+        })])
+    style.configure('TEntry', relief='flat', bd=0)
+
+
+# ----- THEME END ----- #
 
 # Contact Array
 contact_array: dict = dict()  # key: ip address as a string, value: [port, user_name]
@@ -126,12 +310,13 @@ welcome_message: str = "Welcome to the PyChat chat application"  # TODO: Usused
 
 
 def update_theme():
-    if COLOR_THEME == THEME_LIGHT:
-        update_color_light()  # Theme colors: background, foreground, active, selection
-    elif COLOR_THEME == THEME_DARK:
-        update_color_dark()
-    update_relief()  # Theme reliefs: "flat", "sunken", "raised"
-    update_border()  # Theme borders: width, thickness of the border. Is an integer
+    pass
+    # if COLOR_THEME == THEME_LIGHT:
+    #     update_color_light()  # Theme colors: background, foreground, active, selection
+    # elif COLOR_THEME == THEME_DARK:
+    #     update_color_dark()
+    # update_relief()  # Theme reliefs: "flat", "sunken", "raised"
+    # update_border()  # Theme borders: width, thickness of the border. Is an integer
 
 
 def update_color_dark():
@@ -154,25 +339,25 @@ def update_color_dark():
     COLOR_WIN_BG = "#1f1f1f"
     COLOR_WIN_FG = "#8f8f8f"
     COLOR_CHAT_BG = "#2f2f2f"
-    COLOR_CHAT_FG = "#7f7f7f"
+    COLOR_CHAT_FG = "#6f6f6f"
     COLOR_TEXT_INPUT_BG = "#2f2f2f"
-    COLOR_TEXT_INPUT_FG = "#7f7f7f"
-    COLOR_SCROLL_FG = "#3f3f3f"
-    COLOR_SCROLL_BG = "#2f2f2f"
+    COLOR_TEXT_INPUT_FG = "#6f6f6f"
+    COLOR_SCROLL_FG = "#676767"
+    COLOR_SCROLL_BG = "#5c5c5c"
     COLOR_CLIENT_TYPE_BG = "#2f2f2f"
-    COLOR_CLIENT_TYPE_FG = "#7f7f7f"
+    COLOR_CLIENT_TYPE_FG = "#6f6f6f"
     COLOR_CLIENT_TYPE_ACT = COLOR_ACCENT
     COLOR_CONNECTER_BG = "#2f2f2f"
-    COLOR_CONNECTER_FG = "#7f7f7f"
+    COLOR_CONNECTER_FG = "#6f6f6f"
     COLOR_CONNECTER_ACT = COLOR_ACCENT
     COLOR_OK_BTN_BG = "#2f2f2f"
-    COLOR_OK_BTN_FG = "#7f7f7f"
+    COLOR_OK_BTN_FG = "#6f6f6f"
     COLOR_OK_BTN_ACT = None
     COLOR_BTN_BG = "#2f2f2f"
-    COLOR_BTN_FG = "#7f7f7f"
+    COLOR_BTN_FG = "#6f6f6f"
     COLOR_BTN_ACT = None
     COLOR_LIST_BG = "#2f2f2f"
-    COLOR_LIST_FG = "#7f7f7f"
+    COLOR_LIST_FG = "#6f6f6f"
     COLOR_LIST_SEL = COLOR_ACCENT
     COLOR_LBL_BG = COLOR_WIN_BG
     COLOR_LBL_FG = COLOR_WIN_FG
@@ -256,12 +441,12 @@ def update_border():
     BORDER_LBL = 0
 
 
-class CryptedPackageSystem(PackageSystem):
+class CryptedPacketSystem(PacketSystem):
     def __init__(self, conn):
-        super(CryptedPackageSystem, self).__init__(conn)
+        super(CryptedPacketSystem, self).__init__(conn)
 
     def send_c(self, o, key):
-        _, data = PackageEncoder(o).get_encoded()
+        _, data = PacketEncoder(o).get_encoded()
         # print(data, key)
         data = Network(chatText).encrypt(data, key)
         length = len(data)
@@ -283,7 +468,91 @@ class CryptedPackageSystem(PackageSystem):
             data = self.conn.recv(int(length.decode()))
         except ValueError:
             return None
-        return PackageDecoder(Network(chatText).decrypt(data, key)).get_decoded()
+        return PacketDecoder(Network(chatText).decrypt(data, key)).get_decoded()
+
+
+# noinspection PyAttributeOutsideInit,PyUnusedLocal
+class CustomVerticalScrollbar(Canvas):
+    def __init__(self, parent, **kwargs):
+        """
+        Custom scrollbar, using canvas. It can be configured with fg, bg and command
+
+        :param parent:
+        :param kwargs:
+        """
+
+        self.command = kwargs.pop("command", None)
+        kw = kwargs.copy()
+        bd = 0
+        hlt = 0
+        if "fg" in kw.keys():
+            del kw["fg"]
+        if "bd" in kw.keys():
+            bd = kw.pop("bd")
+        if "border" in kw.keys():
+            bd = kw.pop("border")
+        if "highlightthickness" in kw.keys():
+            hlt = kw.pop("highlightthickness")
+        Canvas.__init__(self, parent, **kw, highlightthickness=hlt, border=bd, bd=bd)
+        if "fg" not in kwargs.keys():
+            kwargs["fg"] = "darkgray"
+
+        # coordinates are irrelevant; they will be recomputed
+        # in the 'set' method\
+        self.old_y = 0
+        self._id = self.create_rectangle(0, 0, 1, 1, fill=kwargs["fg"], outline=kwargs["fg"], tags=("thumb",))
+        self.bind("<ButtonPress-1>", self.on_press)
+        self.bind("<ButtonRelease-1>", self.on_release)
+
+    def configure(self, cnf=None, **kwargs):
+        command = kwargs.pop("command", None)
+        self.command = command if command is not None else self.command
+        kw = kwargs.copy()
+        if "fg" in kw.keys():
+            del kw["fg"]
+        super().configure(**kw, highlightthickness=0, border=0, bd=0)
+        if "fg" not in kwargs.keys():
+            kwargs["fg"] = "darkgray"
+        self.itemconfig(self._id, fill=kwargs["fg"], outline=kwargs["fg"])
+
+    def config(self, cnf=None, **kwargs):
+        self.configure(cnf, **kwargs)
+
+    def redraw(self, event):
+        # The command is presumably the `yview` method of a widget.
+        # When called without any arguments it will return fractions
+        # which we can pass to the `set` command.
+        self.set(*self.command())
+
+    def set(self, first, last):
+        first = float(first)
+        last = float(last)
+        height = self.winfo_height()
+        x0 = int(self.cget("bd"))
+        x1 = self.winfo_width() - int(self.cget("bd"))
+        y0 = max(int(height * first), 0)
+        y1 = min(int(height * last), height)
+        self._x0 = x0
+        self._x1 = x1
+        self._y0 = y0
+        self._y1 = y1
+
+        self.coords("thumb", x0, y0, x1, y1)
+
+    def on_press(self, event):
+        self.bind("<Motion>", self.on_click)
+        self.pressed_y = event.y
+        self.on_click(event)
+
+    def on_release(self, event):
+        self.unbind("<Motion>")
+
+    def on_click(self, event):
+        y = event.y / self.winfo_height()
+        y0 = self._y0
+        y1 = self._y1
+        a = y + ((y1 - y0) / -(self.winfo_height() * 2))
+        self.command("moveto", a)
 
 
 class CustomScrollbar(Canvas):
@@ -367,11 +636,20 @@ class CustomScrollbar(Canvas):
 
 
 class OptionsWindow(Toplevel):
-    def __init__(self, master: Frame, title):
+    def __init__(self, master: ttk.Frame, title):
         super().__init__(master)
+
         self.title(title)
         self.minsize(50, 5)
+        self.wm_resizable(False, False)
         self.bind("<Return>", lambda event: self.go())
+
+        self.update_idletasks()
+
+        x = int(self.winfo_screenwidth() / 2 - self.winfo_width() / 2)
+        y = int(self.winfo_screenheight() / 2 - self.winfo_height() / 2)
+
+        self.wm_geometry(f"+{x}+{y}")
 
         self.grab_set()
         self.focus_set()
@@ -405,8 +683,61 @@ class OptionsWindow(Toplevel):
             window.grab_set()
             window.minsize(300, 100)
             window.maxsize(300, 100)
-            Label(window, text=texty).pack()
-            go = Button(window, text="OK", command=window.destroy)
+            ttk.Label(window, text=texty).pack()
+            go = ttk.Button(window, text="OK", command=window.destroy)
+            go.pack(side=BOTTOM)
+            go.focus_set()
+
+
+class OptionsWindowRoot(Tk):
+    def __init__(self, master: ttk.Frame, title):
+        super().__init__(master)
+        self.title(title)
+        self.minsize(50, 5)
+        self.wm_resizable(False, False)
+        self.bind("<Return>", lambda event: self.go())
+
+        self.update_idletasks()
+
+        x = int(self.winfo_screenwidth() / 2 - self.winfo_width() / 2)
+        y = int(self.winfo_screenheight() / 2 - self.winfo_height() / 2)
+
+        self.wm_geometry(f"+{x}+{y}")
+
+        self.grab_set()
+        self.focus_set()
+
+    def go(self):
+        pass
+
+    def option_delete(self):
+        """
+        Deletes an option
+
+        :return:
+        """
+
+        app.connecter.config(state=NORMAL)
+        self.destroy()
+
+    def error_window(self, texty=""):
+        """
+        Launches a new window to display the message :param texty:.
+
+        :param texty:
+        :return:
+        """
+        global isCLI
+        if isCLI:
+            chatText.write_error(texty, "errMain")
+        else:
+            window = Toplevel(self)
+            window.title("ERROR")
+            window.grab_set()
+            window.minsize(300, 100)
+            window.maxsize(300, 100)
+            ttk.Label(window, text=texty).pack()
+            go = ttk.Button(window, text="OK", command=window.destroy)
             go.pack(side=BOTTOM)
             go.focus_set()
 
@@ -712,7 +1043,7 @@ class Network(object):
 
 
 class ClientOptions(OptionsWindow):
-    def __init__(self, master: Frame):
+    def __init__(self, master: ttk.Frame):
         """
         Launches client options window for getting destination hostname
         and port.
@@ -722,16 +1053,16 @@ class ClientOptions(OptionsWindow):
         super(ClientOptions, self).__init__(master, "Connection options")
         self.protocol("WM_DELETE_WINDOW", lambda: self.option_delete())
 
-        Label(self, text="Server adress:").grid(row=0)
-        self.location_ = Entry(self)
+        ttk.Label(self, text="Server adress:").grid(row=0)
+        self.location_ = ttk.Entry(self)
         self.location_.grid(row=0, column=1)
         self.location_.focus_set()
 
-        Label(self, text="Poort:").grid(row=1)
-        self.port_ = Entry(self)
+        ttk.Label(self, text="Poort:").grid(row=1)
+        self.port_ = ttk.Entry(self)
         self.port_.grid(row=1, column=1)
 
-        go_btn = Button(self, text="Connect", command=lambda: self.go())
+        go_btn = ttk.Button(self, text="Connect", command=lambda: self.go())
         go_btn.grid(row=2, column=1)
 
     def go(self):
@@ -791,7 +1122,7 @@ def ip_process(ip_array):
 # ------------------------------------------------------------------------------
 
 class ServerOptions(OptionsWindow):
-    def __init__(self, master: Frame):
+    def __init__(self, master: ttk.Frame):
         """
         Launches server options window for getting port.
 
@@ -803,25 +1134,23 @@ class ServerOptions(OptionsWindow):
         super().__init__(master, "Connection options")
         self.protocol("WM_DELETE_WINDOW", lambda: self.option_delete())
 
-        frame_1 = Frame(self, bg=COLOR_WIN_BG)
+        frame = ttk.Frame(self)
 
-        Label(frame_1, text="Port:", bg=COLOR_LBL_BG, fg=COLOR_LBL_FG).pack(side=LEFT)
-        self.portNumber = Entry(
-            frame_1, bg=COLOR_TEXT_INPUT_BG, fg=COLOR_TEXT_INPUT_FG, relief=RELIEF_TEXT_INPUT, border=BORDER_TEXT_INPUT
-        )
-        self.portNumber.pack(side=LEFT, fill=X, expand=True)
+        frame_1 = ttk.Frame(frame)
+
+        ttk.Label(frame_1, text="Port:").pack(side=LEFT, padx=1, pady=1)
+        self.portNumber = ttk.Entry(frame_1)
+        self.portNumber.pack(side=LEFT, fill=X, expand=True, pady=1, padx=1)
         self.portNumber.focus_set()
 
-        frame_1.pack(fill=BOTH, expand=True)
-        frame_2 = Frame(self, bg=COLOR_WIN_BG)
+        frame_1.pack(fill=BOTH, expand=True, pady=1)
+        frame_2 = ttk.Frame(frame)
 
-        go_btn = Button(
-            frame_2, text="Launch", bg=COLOR_OK_BTN_BG, fg=COLOR_OK_BTN_FG, command=lambda: self.go(),
-            relief=RELIEF_OK_BTN, border=BORDER_OK_BTN
-        )
-        go_btn.pack(side=RIGHT)
+        go_btn = ttk.Button(frame_2, text="Launch", command=lambda: self.go())
+        go_btn.pack(side=RIGHT, pady=1, padx=1)
 
         frame_2.pack(fill=X, expand=True)
+        frame.pack(fill="both", expand=True)
 
         self.chatText = chat_text
 
@@ -844,7 +1173,7 @@ class ServerOptions(OptionsWindow):
 # -------------------------------------------------------------------------
 
 class UsernameOptions(OptionsWindow):
-    def __init__(self, master: Frame, network: Network):
+    def __init__(self, master: ttk.Frame, network: Network):
         """
         Launches user_name options window for setting user_name.
 
@@ -853,18 +1182,11 @@ class UsernameOptions(OptionsWindow):
         """
         super().__init__(master, "User options")
 
-        go_btn = Button(
-            self, text="Change", command=lambda: self.go(), bg=COLOR_OK_BTN_BG, fg=COLOR_OK_BTN_FG,
-            relief=RELIEF_OK_BTN, border=RELIEF_OK_BTN
-        )
+        go_btn = ttk.Button(self, text="Change", command=lambda: self.go())
         go_btn.pack(side=BOTTOM)
 
-        Label(
-            self, text="Name:", bg=COLOR_LBL_BG, fg=COLOR_LBL_FG, relief=RELIEF_LBL, border=BORDER_LBL
-        ).pack(side=LEFT)
-        self.userName = Entry(
-            self, bg=COLOR_TEXT_INPUT_BG, fg=COLOR_TEXT_INPUT_FG, relief=RELIEF_TEXT_INPUT, border=BORDER_TEXT_INPUT
-        )
+        ttk.Label(self, text="Name:").pack(side=LEFT)
+        self.userName = ttk.Entry(self)
         self.userName.focus_set()
         self.userName.pack(side=LEFT, fill=X, expand=True)
 
@@ -905,14 +1227,28 @@ def message_window(master, texty="", title="ERROR"):
         window.grab_set()
         window.minsize(300, 100)
         window.maxsize(300, 100)
+        window.wm_resizable(False, False)
+        window.update_idletasks()
 
-        Label(window, text=texty).pack()
-        go = Button(
-            window, text="OK", command=window.destroy, bg=COLOR_OK_BTN_BG, fg=COLOR_OK_BTN_FG,
-            relief=RELIEF_OK_BTN, border=BORDER_OK_BTN
-        )
-        go.pack(side=BOTTOM)
+        x = int(window.winfo_screenwidth() / 2 - window.winfo_width() / 2)
+        y = int(window.winfo_screenheight() / 2 - window.winfo_height() / 2)
+
+        window.wm_geometry(f"+{x}+{y}")
+
+        frame = ttk.Frame(window)
+
+        labelframe = ttk.Frame(frame)
+        ttk.Label(labelframe, image=ICONS["error"]).pack(side="left", padx=10, pady=10)
+        ttk.Label(labelframe, text=texty).pack(side="left", padx=10)
+        labelframe.pack(side="top", fill="x", expand=True)
+
+        goframe = ttk.Frame(frame)
+        go = ttk.Button(goframe, text="OK", command=window.destroy)
+        go.pack(side="right", padx=6)
         go.focus_set()
+        goframe.pack(side="bottom", fill="x", expand=True)
+
+        frame.pack(fill="both", expand=True)
 
 
 class MessageWindow(object):
@@ -926,11 +1262,8 @@ class MessageWindow(object):
         self.window.grab_set()
         self.window.minsize(300, 240)
 
-        Label(self.window, text=texty, bg=COLOR_LBL_BG, fg=COLOR_LBL_FG, relief=RELIEF_LBL, border=BORDER_LBL).pack(TOP)
-        ok_button = Button(
-            self.window, text="OK", command=self.window.destroy, bg=COLOR_OK_BTN_BG, fg=COLOR_OK_BTN_FG,
-            relief=RELIEF_OK_BTN, border=BORDER_OK_BTN
-        )
+        ttk.Label(self.window, text=texty).pack(TOP)
+        ok_button = ttk.Button(self.window, text="OK", command=self.window.destroy)
         ok_button.pack(BOTTOM)
         ok_button.focus_set()
 
@@ -1008,20 +1341,20 @@ class QuickNetwork(object):
         :return:
         """
 
-        window = OptionsWindow(app.main_frame, "Verbindings opties")
+        def go_func():
+            client_connect(destination.get(), "5120")
+            window.destroy()
 
-        frame = Frame(window, bg=COLOR_WIN_BG)
+        window = OptionsWindow(app.main_frame, "Connection Options")
 
-        Label(frame, text="Server IP:", bg=COLOR_LBL_BG, fg=COLOR_LBL_FG).grid(row=0)
-        destination = Entry(frame, bg=COLOR_TEXT_INPUT_BG, fg=COLOR_TEXT_INPUT_FG, relief=RELIEF_TEXT_INPUT,
-                            border=BORDER_TEXT_INPUT)
-        destination.grid(row=0, column=1)
+        frame = ttk.Frame(window)
 
-        frame.go = lambda: client_connect(destination.get(), "9999")
-        go = Button(frame, text="Verbind", command=lambda: (frame.go(), frame.destroy()),
-                    bg=COLOR_OK_BTN_BG, fg=COLOR_OK_BTN_FG, activebackground=COLOR_OK_BTN_ACT,
-                    relief=RELIEF_BTN, border=BORDER_BTN)
-        go.grid(row=1, column=1)
+        ttk.Label(frame, text="Server IP:").grid(row=0, column=0, padx=1, pady=1)
+        destination = ttk.Entry(frame)
+        destination.grid(row=0, column=1, padx=1, pady=1)
+
+        go = ttk.Button(frame, text="Connect", command=lambda: go_func())
+        go.grid(row=1, column=1, padx=1, pady=1)
         frame.pack(fill=BOTH, expand=True)
 
     @staticmethod
@@ -1032,12 +1365,12 @@ class QuickNetwork(object):
         :return:
         """
 
-        server = Server(9999, chatText, Network(chatText))
+        server = Server(5120, chatText, Network(chatText))
         server.start()
         return server
 
 
-class PasswordWindow(OptionsWindow):
+class PasswordWindow(OptionsWindowRoot):
     def __init__(self, master):
         """
         Menu window for connection options.
@@ -1047,16 +1380,16 @@ class PasswordWindow(OptionsWindow):
 
         super(PasswordWindow, self).__init__(master, "Change Password")
 
-        frame = Frame(self, bg=COLOR_WIN_BG)
+        theme(self)
 
-        Label(frame, text="Password:").grid(row=0)
-        self.passwordEntry = Entry(frame, show="#", bg=COLOR_TEXT_INPUT_BG, fg=COLOR_TEXT_INPUT_FG,
-                                   relief=RELIEF_TEXT_INPUT, border=BORDER_TEXT_INPUT)
-        self.passwordEntry.grid(row=0, column=1)
+        frame = ttk.Frame(self)
 
-        go = Button(frame, text="OK", command=self.go, bg=COLOR_BTN_BG, fg=COLOR_BTN_FG,
-                    relief=RELIEF_BTN, border=BORDER_BTN)
-        go.grid(row=1, column=1)
+        ttk.Label(frame, text="Password:").grid(row=0)
+        self.passwordEntry = ttk.Entry(frame, show="●")
+        self.passwordEntry.grid(row=0, column=1, padx=2, pady=2)
+
+        go = ttk.Button(frame, text="OK", command=self.go)
+        go.grid(row=1, column=1, padx=2, pady=2)
         frame.pack(fill=BOTH, expand=True)
 
     def go(self):
@@ -1147,7 +1480,7 @@ class ClientType(object):
 class ContactsWindow(Toplevel):
     contact_array = {}
 
-    def __init__(self, master: Frame):
+    def __init__(self, master: ttk.Frame):
         """
         Displays the contacts window, allowing the user to select a recent
         connection to reuse.
@@ -1158,23 +1491,27 @@ class ContactsWindow(Toplevel):
         global contact_array
         super(ContactsWindow, self).__init__(master)
         self.title("Contacts")
+
         self.grab_set()
-        scrollbar = CustomScrollbar(self, relief=FLAT, border=0, width=10, highlightthickness=0,
-                                    bg=COLOR_SCROLL_BG, fg=COLOR_SCROLL_FG, height=0)
-        self.listbox = Listbox(self, yscrollcommand=scrollbar.set, border=0, relief=FLAT,
+        self.innerFrame = ttk.Frame(self)
+
+        scrollbar = CustomVerticalScrollbar(self.innerFrame, relief="flat", border=0, width=10, highlightthickness=0,
+                                            bg=COLOR_SCROLL_BG, fg=COLOR_SCROLL_FG, height=0)
+        self.listbox = Listbox(self.innerFrame, yscrollcommand=scrollbar.set, border=0, highlightthickness=0,
                                bg=COLOR_LIST_BG, fg=COLOR_LIST_FG, selectbackground=COLOR_LIST_SEL)
         scrollbar.config(command=self.listbox.yview)
         scrollbar.pack(side=RIGHT, fill=Y)
-        buttons = Frame(self)
-        c_but = Button(buttons, text="Connect", bg=COLOR_BTN_BG, fg=COLOR_BTN_FG, relief=FLAT, border=0,
-                       command=lambda: self.contacts_connect())
+
+        self.innerFrame.pack(fill="both", expand=True)
+
+        buttons = ttk.Frame(self)
+        c_but = ttk.Button(buttons, text="Connect", command=lambda: self.contacts_connect())
         c_but.pack(side=LEFT)
-        d_but = Button(buttons, text="Delete", bg=COLOR_BTN_BG, fg=COLOR_BTN_FG, relief=FLAT, border=0,
-                       command=lambda: self.contacts_remove(
-                       ))
+
+        d_but = ttk.Button(buttons, text="Delete", command=lambda: self.contacts_remove())
         d_but.pack(side=LEFT)
-        a_but = Button(buttons, text="Add", bg=COLOR_BTN_BG, fg=COLOR_BTN_FG, relief=FLAT, border=0,
-                       command=lambda: self.contacts_add())
+
+        a_but = ttk.Button(buttons, text="Add", command=lambda: self.contacts_add())
         a_but.pack(side=LEFT)
         buttons.pack(side=BOTTOM)
 
@@ -1183,6 +1520,13 @@ class ContactsWindow(Toplevel):
                                 person + " " + contact_array[person][0])
         self.listbox.pack(side=LEFT, fill=BOTH, expand=1)
 
+        self.update_idletasks()
+
+        x = int(self.winfo_screenwidth() / 2 - self.winfo_width() / 2)
+        y = int(self.winfo_screenheight() / 2 - self.winfo_height() / 2)
+
+        self.wm_geometry(f"+{x}+{y}")
+
     def contacts_connect(self):
         """
         Establish a connection between two contacts.
@@ -1190,6 +1534,10 @@ class ContactsWindow(Toplevel):
         :return:
         """
         item = self.listbox.get(ACTIVE).split(" ")
+        if item == [""]:
+            return
+
+        print(item)
 
         Client(item[1], int(item[2]), chatText).start()
 
@@ -1214,22 +1562,48 @@ class ContactsWindow(Toplevel):
         """
 
         a_window = Toplevel(self)
+        a_window.wm_geometry("250x119")
+        a_window.wm_minsize(250, 119)
+        a_window.wm_maxsize(400, 119)
+        a_window.wm_resizable(True, False)
+
+        a_window.update_idletasks()
+
+        x = int(a_window.winfo_screenwidth() / 2 - 250 / 2)
+        y = int(a_window.winfo_screenheight() / 2 - 119 / 2)
+
+        a_window.wm_geometry(f"+{x}+{y}")
         a_window.title("Add contact")
-        a_frame = Frame(a_window, bg=COLOR_WIN_BG)
-        Label(a_frame, text="Name:", bg=COLOR_WIN_BG, fg=COLOR_WIN_FG).grid(row=0)
-        name = Entry(a_frame, relief=FLAT, border=0, bg=COLOR_TEXT_INPUT_BG, fg=COLOR_TEXT_INPUT_FG)
+        a_frame = ttk.Frame(a_window)
+        # a_frame.grid_columnconfigure(1, )
+
+        name_frame = ttk.Frame(a_frame)
+        ttk.Label(name_frame, text="Name:", width=8).pack(side="left")
+        name = ttk.Entry(name_frame)
         name.focus_set()
-        name.grid(row=0, column=1)
-        Label(a_frame, text="IP:", bg=COLOR_WIN_BG, fg=COLOR_WIN_FG).grid(row=1)
-        ip = Entry(a_frame, relief=FLAT, border=0, bg=COLOR_TEXT_INPUT_BG, fg=COLOR_TEXT_INPUT_FG)
-        ip.grid(row=1, column=1)
-        Label(a_frame, text="Port:", bg=COLOR_WIN_BG, fg=COLOR_WIN_FG).grid(row=2)
-        port_ = Entry(a_frame)
-        port_.grid(row=2, column=1)
-        go = Button(a_frame, text="Add", relief=FLAT, border=0, bg=COLOR_OK_BTN_BG, fg=COLOR_OK_BTN_FG,
-                    command=lambda: self.contacts_add_helper(name.get(), ip.get(), port_.get(), a_window)
-                    )
-        go.grid(row=3, column=1)
+        name.pack(side="left", fill="x", expand=True, pady=1, padx=1)
+        name_frame.pack(side="top", fill="x", pady=1, padx=1)
+
+        ip_frame = ttk.Frame(a_frame)
+        ttk.Label(ip_frame, text="IP:", width=8).pack(side="left")
+        ip = ttk.Entry(ip_frame)
+        ip.pack(side="left", fill="x", pady=1, expand=True, padx=1)
+        ip_frame.pack(side="top", fill="x", pady=1, padx=1)
+
+        port_frame = ttk.Frame(a_frame)
+        ttk.Label(port_frame, text="Port:", width=8).pack(side="left")
+        port_ = ttk.Entry(port_frame)
+        port_.pack(side="left", fill="x", pady=1, expand=True, padx=1)
+        port_frame.pack(side="top", fill="x", pady=1, padx=1)
+
+        go_frame = ttk.Frame(a_frame)
+        ttk.Label(go_frame, text="", width=12).pack(side="left")
+        go = ttk.Button(
+            go_frame, text="Add", command=lambda: self.contacts_add_helper(name.get(), ip.get(), port_.get(), a_window),
+            width=12)
+        go.pack(side="right", pady=1, padx=1)
+        go_frame.pack(side="bottom", fill="x", pady=1, padx=1)
+
         a_frame.pack(fill=BOTH, expand=TRUE)
 
     def contacts_add_helper(self, username: str, ip: str, port_: str, window: Toplevel):
@@ -1373,7 +1747,6 @@ class ChatText(object):
         """
 
         global max_len
-        global app
         if not isCLI:
             app.main_body.mainBodyText.config(state=NORMAL)
             text_b = text
@@ -1405,7 +1778,7 @@ class ChatText(object):
         :param username:
         :return:
         """
-        self.write2screen('white', '#ff3737', text, username)
+        self.write2screen('white', '#ff3747', text, username)
 
     def write_warn(self, text='', username=''):
         """
@@ -1415,7 +1788,7 @@ class ChatText(object):
         :param username:
         :return:
         """
-        self.write2screen('white', '#ffff37', text, username)
+        self.write2screen('white', '#ffff47', text, username)
 
     def write_info(self, text: str = '', username: str = ''):
         """
@@ -1425,11 +1798,11 @@ class ChatText(object):
         :param username:
         :return:
         """
-        self.write2screen('white', '#37a7a7', text, username)
+        self.write2screen('white', '#37a7b7', text, username)
 
     def write_succes(self, text: str = '', username: str = ''):
         """Write a succes to the screen the "green" color"""
-        self.write2screen('white', '#37ff37', text, username)
+        self.write2screen('white', '#37ff47', text, username)
 
     def write_chat(self, text: str = '', username: str = ''):
         """Write a succes to the screen the "darkcyan" color"""
@@ -1483,22 +1856,23 @@ def process_user_input(text: str, network: Network):
 
 
 def set_color():
-    global user_color
-    global color_list
-
-    color = colorchooser.askcolor()
-    color_list = color[0]
-    user_color = color[1]
-
-    update_theme()
-
-    # Set theme colors
-    app.main_frame.config(bg=COLOR_WIN_BG)
-    app.main_body_text.config(bg=COLOR_CHAT_BG)
-    app.body_text_scroll.config(bg=COLOR_SCROLL_BG, fg=COLOR_SCROLL_FG)
-    app.client_type_1.config(bg=COLOR_CLIENT_TYPE_BG, fg=COLOR_CLIENT_TYPE_FG, selectcolor=COLOR_CLIENT_TYPE_ACT)
-    app.client_type_2.config(bg=COLOR_CLIENT_TYPE_BG, fg=COLOR_CLIENT_TYPE_FG, selectcolor=COLOR_CLIENT_TYPE_ACT)
-    app.connecter.config(bg=COLOR_CONNECTER_BG, fg=COLOR_CONNECTER_FG, activebackground=COLOR_ACCENT)
+    pass
+    # global user_color
+    # global color_list
+    #
+    # color = colorchooser.askcolor()
+    # color_list = color[0]
+    # user_color = color[1]
+    #
+    # update_theme()
+    #
+    # # Set theme colors
+    # app.main_frame.config(bg=COLOR_WIN_BG)
+    # app.main_body_text.config(bg=COLOR_CHAT_BG)
+    # app.body_text_scroll.config(bg=COLOR_SCROLL_BG, fg=COLOR_SCROLL_FG)
+    # app.client_type_1.config(bg=COLOR_CLIENT_TYPE_BG, fg=COLOR_CLIENT_TYPE_FG, selectcolor=COLOR_CLIENT_TYPE_ACT)
+    # app.client_type_2.config(bg=COLOR_CLIENT_TYPE_BG, fg=COLOR_CLIENT_TYPE_FG, selectcolor=COLOR_CLIENT_TYPE_ACT)
+    # app.connecter.config(bg=COLOR_CONNECTER_BG, fg=COLOR_CONNECTER_FG, activebackground=COLOR_ACCENT)
 
 
 class ChatThread(threading.Thread):
@@ -1610,7 +1984,7 @@ class Server(ChatThread):
             s.listen(1)
 
             conn_init, addr_init = s.accept()
-            pak_init = PackageSystem(conn_init)
+            pak_init = PacketSystem(conn_init)
             serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             serv.bind(('', 0))  # get a random empty port_
             serv.listen(1)
@@ -1625,9 +1999,9 @@ class Server(ChatThread):
 
             conn_init.close()
             conn, addr = serv.accept()
-            pak = PackageSystem(conn)
+            pak = PacketSystem(conn)
             Network.conn_array.append(conn)  # add an array entry for this connection
-            Network.pak_array[conn] = CryptedPackageSystem(conn)
+            Network.pak_array[conn] = CryptedPacketSystem(conn)
             self.chatText.write_succes("Connected with server " + str(addr[0]))
 
             if not isCLI:
@@ -1709,16 +2083,16 @@ class Client(ChatThread):
         """
         conn_init2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         conn_init2.settimeout(5.0)
-        pak_init = PackageSystem(conn_init2)
+        pak_init = PacketSystem(conn_init2)
         try:
             conn_init2.connect((self.host, self.port))
         except socket.timeout:
-            self.chatText.write_error("Timeout-melding. Host is mogelijk niet hier.", "client")
-            app.connecter.config(state=NORMAL)
+            self.chatText.write_error("Timeout. Host is possibly not here.", "<Client>")
+            app.connType.connecter.config(state=NORMAL)
             raise SystemExit(0)
         except socket.error:
-            self.chatText.write_error("Connectie melding. Host heeft net de verbinding geweigerd.", "server")
-            app.connecter.config(state=NORMAL)
+            self.chatText.write_error("Access Denied. Access to that IP adress was denied", "<Client>")
+            app.connType.connecter.config(state=NORMAL)
             raise SystemExit(0)
 
         # Get server port
@@ -1732,7 +2106,7 @@ class Client(ChatThread):
         # Chat connector
         conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         conn.connect((self.host, server_port))
-        pak = PackageSystem(conn)
+        pak = PacketSystem(conn)
 
         # Write status
         self.chatText.write_succes("Verbonden met: " + self.host +
@@ -1743,7 +2117,7 @@ class Client(ChatThread):
         app.connecter.config(state=NORMAL)
 
         Network.conn_array.append(conn)
-        Network.pak_array[conn] = CryptedPackageSystem(conn)
+        Network.pak_array[conn] = CryptedPacketSystem(conn)
 
         socket.gethostbyname(socket.gethostname())
 
@@ -1808,17 +2182,17 @@ class MainMenuBar(Menu):
 
 class MainBody(Frame):
     def __init__(self, frame):
-        super().__init__(frame, relief=FLAT, border=0)
+        super().__init__(frame, border=0)
 
         # Create text and scrollbar
-        self.mainBodyText = Text(self, relief=FLAT, border=0, bg=COLOR_TEXT_INPUT_BG)
-        self.bodyTextScroll = CustomScrollbar(
-            self, fg=COLOR_SCROLL_FG, bg=COLOR_SCROLL_BG, width=10, highlightthickness=0
+        self.mainBodyText = Text(self, border=0, bg=COLOR_TEXT_INPUT_BG, font=("Consolas", 11), highlightthicknes=0)
+        self.bodyTextScroll = CustomVerticalScrollbar(
+            self, fg="#676767", bg="#5c5c5c", width=10, highlightthickness=0
         )
 
         # Packing text and scrollbar
         self.bodyTextScroll.pack(side=RIGHT, fill=Y)
-        self.mainBodyText.pack(side=LEFT, fill=BOTH, expand=True)
+        self.mainBodyText.pack(side=LEFT, fill=BOTH, expand=True, padx=1, pady=1)
 
         # Configurate text and scrollbar
         self.bodyTextScroll.config(command=self.mainBodyText.yview)
@@ -1831,9 +2205,9 @@ class MainBody(Frame):
         self.mainBodyText.config(state=DISABLED)
 
 
-class MainChatInput(Entry):
+class MainChatInput(ttk.Entry):
     def __init__(self, frame):
-        super(MainChatInput, self).__init__(frame, relief=FLAT, border=0, bg=COLOR_TEXT_INPUT_BG)
+        super(MainChatInput, self).__init__(frame)
         self.bind("<Return>", lambda evt: process_user_text(evt, Network(chatText)))
         self.pack(fill=X, padx=2, pady=2)
         self.focus_set()
@@ -1858,53 +2232,96 @@ class MainConnType(object):
         )
         self.client_type_1.pack(anchor=E)
         self.client_type_2.pack(anchor=E)
-        self.connecter = Button(
-            main_frame, textvariable=self.stateConnect, relief=FLAT, bg=COLOR_CONNECTER_BG, fg=COLOR_CONNECTER_FG,
-            command=lambda: ClientType.connects(self.clientType, Network(chatText)), activebackground=COLOR_ACCENT
-        )
+        self.connecter = ttk.Button(
+            main_frame, textvariable=self.stateConnect,
+            command=lambda: ClientType.connects(self.clientType, Network(chatText)))
         self.connecter.pack()
 
 
 class App(Tk):
     def __init__(self):
+        if password is None:
+            pass_window = PasswordWindow(None)
+            pass_window.mainloop()
+            dump_data()
+
         super(App, self).__init__()
+
+        theme(self)
+
+        ICONS["error"] = PhotoImage(file="assets/error.png")
+
+        global app
+        app = self
 
         self.title(titleText + " " + chatVersion)
         self.protocol("WM_DELETE_WINDOW", lambda: self.exit_app())
 
-        # Load data and update theme
-        load_data()
-        update_theme()
+        # global app
+        app = self
 
         # Main frame, used for window background
-        self.main_frame = Frame(self, relief=FLAT, border=0, highlightthickness=0, bg=COLOR_WIN_BG)
+        self.main_frame = ttk.Frame(self, border=0)
         self.main_frame.pack(fill=BOTH, expand=TRUE)
+
+        # global app
+        app = self
 
         # Create menu bar
         self.menubar = MainMenuBar(self.main_frame, self)
 
+        # global app
+        app = self
+
         # Sets menu bar
         self.config(menu=self.menubar)
+
+        # global app
+        app = self
 
         # Main body
         self.main_body = MainBody(self.main_frame)
 
+        # global app
+        app = self
+
         # Create chat input
         self.text_input = MainChatInput(self.main_frame)
+
+        # global app
+        app = self
 
         # Connection state radiobutton:
         self.connType = MainConnType(self.main_frame)
 
-        if password is None:
-            pass_window = PasswordWindow(self.main_frame)
-            pass_window.mainloop()
-            dump_data()
+        # global app
+        app = self
+
+        # global app
+        app = self
 
         # Welcome message
         if welcomeSign:
             chatText.write2screen('white', "black", f"{user_name}, welcome on the chat application", "")
 
+        # global app
+        app = self
+
+        # Load data and update theme
+        load_data()
+        update_theme()
+
+        # global app
+        app = self
+
         # ------------------------------------------------------------#
+
+        self.update_idletasks()
+
+        x = int(self.winfo_screenwidth() / 2 - self.winfo_width() / 2)
+        y = int(self.winfo_screenheight() / 2 - self.winfo_height() / 2)
+
+        self.wm_geometry(f"+{x}+{y}")
 
         # Main loop
         self.main_frame.mainloop()
@@ -1925,5 +2342,5 @@ if __name__ == "__main__":
     else:
         chatText = ChatText()
         # Create window
-        global app
+        # global app
         app = App()

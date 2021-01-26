@@ -92,8 +92,8 @@ class OptionsWindow(Toplevel):
             window.title("ERROR")
             window.grab_set()
             window.minsize(300, 240)
-            Label(window, text=texty).pack()
-            go = Button(window, text="OK", command=window.destroy)
+            ttk.Label(window, text=texty).pack()
+            go = ttk.Button(window, text="OK", command=window.destroy)
             go.pack()
             go.focus_set()
 
@@ -312,16 +312,16 @@ class ClientOptions(OptionsWindow):
         super(ClientOptions, self).__init__(master, "Connection options")
         self.protocol("WM_DELETE_WINDOW", lambda: self.option_delete())
         
-        Label(self, text="Server adress:").grid(row=0)
-        self.location_ = Entry(self)
+        ttk.Label(self, text="Server adress:").grid(row=0)
+        self.location_ = ttk.Entry(self)
         self.location_.grid(row=0, column=1)
         self.location_.focus_set()
         
-        Label(self, text="Poort:").grid(row=1)
-        self.port_ = Entry(self)
+        ttk.Label(self, text="Poort:").grid(row=1)
+        self.port_ = ttk.Entry(self)
         self.port_.grid(row=1, column=1)
         
-        go_btn = Button(self, text="Connect", command=lambda: self.go())
+        go_btn = ttk.Button(self, text="Connect", command=lambda: self.go())
         go_btn.grid(row=2, column=1)
     
     def go(self):
@@ -395,12 +395,12 @@ class ServerOptions(OptionsWindow):
         super().__init__(master, "Connection options")
         self.protocol("WM_DELETE_WINDOW", lambda: self.option_delete())
 
-        Label(self, text="Port:").grid(row=0)
-        self.portNumber = Entry(self)
+        ttk.Label(self, text="Port:").grid(row=0)
+        self.portNumber = ttk.Entry(self)
         self.portNumber.grid(row=0, column=1)
         self.portNumber.focus_set()
 
-        go_btn = Button(self, text="Launch",
+        go_btn = ttk.Button(self, text="Launch",
                         command=lambda: self.go())
         go_btn.grid(row=1, column=1)
         
@@ -434,11 +434,11 @@ class UsernameOptions(OptionsWindow):
         """
         super().__init__(master, "User options")
 
-        go_btn = Button(self, text="Change", command=lambda: self.go())
+        go_btn = ttk.Button(self, text="Change", command=lambda: self.go())
         go_btn.pack(side=BOTTOM)
 
-        Label(self, text="Name:").pack(side=LEFT)
-        self.userName = Entry(self)
+        ttk.Label(self, text="Name:").pack(side=LEFT)
+        self.userName = ttk.Entry(self)
         self.userName.focus_set()
         self.userName.pack(side=LEFT, fill=X, expand=True)
         
@@ -478,8 +478,8 @@ def message_window(master, texty="", title="ERROR"):
         window.grab_set()
         window.minsize(300, 240)
 
-        Label(window, text=texty).pack()
-        go = Button(window, text="OK", command=window.destroy)
+        ttk.Label(window, text=texty).pack()
+        go = ttk.Button(window, text="OK", command=window.destroy)
         go.pack()
         go.focus_set()
         
@@ -495,8 +495,8 @@ class MessageWindow(object):
         self.window.grab_set()
         self.window.minsize(300, 240)
 
-        Label(self.window, text=texty).pack(TOP)
-        ok_button = Button(self.window, text="OK", command=self.window.destroy)
+        ttk.Label(self.window, text=texty).pack(TOP)
+        ok_button = ttk.Button(self.window, text="OK", command=self.window.destroy)
         ok_button.pack(BOTTOM)
         ok_button.focus_set()
         
@@ -577,12 +577,12 @@ class QuickNetwork(object):
     
         window = OptionsWindow(root, "Verbindings opties")
         
-        Label(window, text="Server IP:").grid(row=0)
-        destination = Entry(window)
+        ttk.Label(window, text="Server IP:").grid(row=0)
+        destination = ttk.Entry(window)
         destination.grid(row=0, column=1)
 
-        window.go = lambda: client_connect(destination.get(), "9999")
-        go = Button(window, text="Verbind", command=window.go)
+        window.go = lambda: client_connect(destination.get(), "5120")
+        go = ttk.Button(window, text="Verbind", command=window.go)
         go.grid(row=1, column=1)
     
 
@@ -594,7 +594,7 @@ class QuickNetwork(object):
         :return:
         """
     
-        server = Server(9999, chatText)
+        server = Server(5120, chatText)
         server.start()
         return server
 
@@ -688,14 +688,14 @@ class ContactsWindow(Toplevel):
         self.listbox = Listbox(self, yscrollcommand=scrollbar.set)
         scrollbar.config(command=self.listbox.yview)
         scrollbar.pack(side=RIGHT, fill=Y)
-        buttons = Frame(self)
-        c_but = Button(buttons, text="Connect", command=lambda: self.contacts_connect())
+        buttons = ttk.Frame(self)
+        c_but = ttk.Button(buttons, text="Connect", command=lambda: self.contacts_connect())
         c_but.pack(side=LEFT)
-        d_but = Button(buttons, text="Delete",
+        d_but = ttk.Button(buttons, text="Delete",
                        command=lambda: self.contacts_remove(
                        ))
         d_but.pack(side=LEFT)
-        a_but = Button(buttons, text="Add",
+        a_but = ttk.Button(buttons, text="Add",
                        command=lambda: self.contacts_add())
         a_but.pack(side=LEFT)
         buttons.pack(side=BOTTOM)
@@ -738,17 +738,17 @@ class ContactsWindow(Toplevel):
         
         a_window = Toplevel(self)
         a_window.title("Add contact")
-        Label(a_window, text="Name:").grid(row=0)
-        name = Entry(a_window)
+        ttk.Label(a_window, text="Name:").grid(row=0)
+        name = ttk.Entry(a_window)
         name.focus_set()
         name.grid(row=0, column=1)
-        Label(a_window, text="IP:").grid(row=1)
-        ip = Entry(a_window)
+        ttk.Label(a_window, text="IP:").grid(row=1)
+        ip = ttk.Entry(a_window)
         ip.grid(row=1, column=1)
-        Label(a_window, text="Port:").grid(row=2)
-        port_ = Entry(a_window)
+        ttk.Label(a_window, text="Port:").grid(row=2)
+        port_ = ttk.Entry(a_window)
         port_.grid(row=2, column=1)
-        go = Button(a_window, text="Add",
+        go = ttk.Button(a_window, text="Add",
                     command=lambda: self.contacts_add_helper(name.get(), ip.get(), port_.get(), a_window)
                     )
         go.grid(row=3, column=1)
@@ -1260,7 +1260,7 @@ if __name__ == "__main__":
         main_frame.config(menu=menubar)
 
         # Main body
-        main_body = Frame(main_frame, height=120, width=50)
+        main_body = ttk.Frame(main_frame, height=120, width=50)
         main_body_text = Text(main_body, height=40, width=114)
 
         body_text_scroll = Scrollbar(main_body)
@@ -1277,7 +1277,7 @@ if __name__ == "__main__":
         main_body_text.config(state=DISABLED)
 
         # Create chat input
-        text_input = Entry(main_frame, width=114)
+        text_input = ttk.Entry(main_frame, width=114)
         text_input.bind("<Return>", process_user_text)
         text_input.pack()
         text_input.focus_set()
@@ -1292,7 +1292,7 @@ if __name__ == "__main__":
                     value=0, command=to_one).pack(anchor=E)
         Radiobutton(main_frame, text="Server", variable=clientType,
                     value=1, command=to_two).pack(anchor=E)
-        connecter = Button(main_frame, textvariable=stateConnect,
+        connecter = ttk.Button(main_frame, textvariable=stateConnect,
                            command=lambda: connects(clientType))
         connecter.pack()
 

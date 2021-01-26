@@ -115,7 +115,7 @@ class Compiler(object):
         self.runtimeTempDir = runtime_tmpdir
         self.bootloaderIgnoreSignals = bootloader_ignore_signals
 
-        # Manual Command Entry
+        # Manual Command ttk.Entry
         self.additionalArgs = additional_args
 
         if fix_recursion_limit:
